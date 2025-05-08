@@ -8,7 +8,7 @@
     "dialect": "postgres",
     "logging": false,
     "dialectOptions": {
-      "ssl": false
+      "ssl": true
     },
     "define": {
       "timestamps": false,
