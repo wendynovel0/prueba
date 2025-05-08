@@ -1,0 +1,57 @@
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          example: 1
+          description: ID único del producto
+        code:
+          type: string
+          example: "IP13-128"
+          description: Código único del producto
+          maxLength: 50
+        name:
+          type: string
+          example: "iPhone 13 128GB"
+          description: Nombre del producto
+          maxLength: 100
+        description:
+          type: string
+          example: "Smartphone con chip A15 Bionic"
+          description: Descripción detallada del producto
+          nullable: true
+        price:
+          type: number
+          format: float
+          example: 17999.00
+          description: Precio en MXN
+          minimum: 0
+        brand_id:
+          type: integer
+          example: 1
+          description: ID de la marca asociada
+        is_active:
+          type: boolean
+          example: true
+          description: Indica si el producto está activo
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Fecha de creación
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+          description: Fecha de última actualización
+        brand:
+          $ref: '#/components/schemas/Brand'
+      required:
+        - product_id
+        - code
+        - name
+        - price
+        - brand_id
+        - is_active

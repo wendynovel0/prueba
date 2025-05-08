@@ -1,0 +1,29 @@
+    Brand:
+      type: object
+      properties:
+        brand_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Apple"
+          maxLength: 100
+        description:
+          type: string
+          example: "Empresa líder en tecnología"
+          nullable: true
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"
+      required:
+        - brand_id
+        - name
+        - is_active
