@@ -526,6 +526,8 @@ app.post('/login', async (req, res) => {
  *   get:
  *     summary: Obtener todas las marcas activas
  *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: includeInactive
@@ -542,7 +544,7 @@ app.post('/login', async (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/Brand'
  */
-app.get('/brands', async (req, res) => {
+app.get('/brands', authenticateJWT, async (req, res) => {
   try {
     const { includeInactive } = req.query;
     const where = {};
@@ -567,6 +569,8 @@ app.get('/brands', async (req, res) => {
  *   get:
  *     summary: Obtener una marca por ID
  *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -583,7 +587,7 @@ app.get('/brands', async (req, res) => {
  *       404:
  *         description: Marca no encontrada
  */
-app.get('/brands/:id', async (req, res) => {
+app.get('/brands/:id', authenticateJWT, async (req, res) => {
   try {
     const brand = await Brand.findByPk(req.params.id);
     if (!brand) {
@@ -869,6 +873,8 @@ app.post('/products', authenticateJWT, async (req, res) => {
  *   get:
  *     summary: Obtener todos los productos (con filtros)
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -902,7 +908,7 @@ app.post('/products', authenticateJWT, async (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/Product'
  */
-app.get('/products', async (req, res) => {
+app.get('/products', authenticateJWT, async (req, res) => {
   try {
     const { search, startDate, endDate, is_active } = req.query;
     const where = {};
@@ -912,7 +918,6 @@ app.get('/products', async (req, res) => {
       attributes: ['name']
     }];
 
-    // Filtro de búsqueda
     if (search) {
       where[Op.or] = [
         { code: { [Op.iLike]: `%${search}%` }},
@@ -921,14 +926,12 @@ app.get('/products', async (req, res) => {
       ];
     }
 
-    // Filtro por fechas
     if (startDate || endDate) {
       where.created_at = {};
       if (startDate) where.created_at[Op.gte] = new Date(startDate);
       if (endDate) where.created_at[Op.lte] = new Date(endDate + ' 23:59:59');
     }
 
-    // Filtro por estado
     if (is_active !== undefined) {
       where.is_active = is_active === 'true';
     }
@@ -952,6 +955,8 @@ app.get('/products', async (req, res) => {
  *   get:
  *     summary: Obtener un producto por ID
  *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -964,7 +969,7 @@ app.get('/products', async (req, res) => {
  *       404:
  *         description: Producto no encontrado
  */
-app.get('/products/:id', async (req, res) => {
+app.get('/products/:id', authenticateJWT, async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
       include: [{
