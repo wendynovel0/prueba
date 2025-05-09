@@ -4,21 +4,16 @@ const { Sequelize, DataTypes } = require('sequelize');
 const path = require('path');
 const process = require('process');
 
-// Configuración de Sequelize
-const sequelize = new Sequelize({
+// Configuración de Sequelize para Neon.tech
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
-  dialectOptions: process.env.DB_SSL === 'true' ? {
-    ssl: {
+  dialectOptions: {
+    ssl: { // Neon.tech requiere SSL
       require: true,
-      rejectUnauthorized: false
+      rejectUnauthorized: false // Necesario para evitar errores de certificado
     }
-  } : {},
+  },
   define: {
     underscored: true,
     timestamps: true,
@@ -60,20 +55,20 @@ module.exports = {
   async authenticate() {
     try {
       await sequelize.authenticate();
-      console.log('✅ Database connection established');
+      console.log('✅ Conexión a Neon.tech establecida');
       return true;
     } catch (error) {
-      console.error('❌ Database connection failed:', error);
+      console.error('❌ Error de conexión a Neon.tech:', error);
       return false;
     }
   },
   async syncModels(options = { alter: true, force: false }) {
     try {
       await sequelize.sync(options);
-      console.log('🔄 Database models synchronized');
+      console.log('🔄 Modelos sincronizados con Neon.tech');
       return true;
     } catch (error) {
-      console.error('❌ Model synchronization failed:', error);
+      console.error('❌ Error al sincronizar modelos:', error);
       return false;
     }
   }

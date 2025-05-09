@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { Pool } = require('pg');
 const express = require('express');
 const { sequelize, User, Brand, Product, ActionLog } = require('./models');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -9,6 +10,18 @@ const setupSwagger = require('./swagger/swagger.config');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false // Necesario para Neon
+  }
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) console.error("Error de conexión:", err);
+  else console.log("Conexión exitosa a Neon.tech:", res.rows[0]);
+});
 app.use(express.json());
 
 setupSwagger(app);
