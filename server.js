@@ -803,6 +803,79 @@ app.patch('/brands/:id/activate', authenticateJWT, async (req, res) => {
 
 /**
  * @swagger
+ * /brands/{id}/deactivate:
+ *   patch:
+ *     summary: Desactivar marca
+ *     tags: [Brands]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       description: Opcionalmente puedes incluir un motivo de desactivación
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 example: "Marca discontinuada"
+ *     responses:
+ *       200:
+ *         description: Marca desactivada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: No autorizado
+ *       404:
+ *         description: Marca no encontrada
+ */
+app.patch('/brands/:id/deactivate', authenticateJWT, async (req, res) => {
+  try {
+    const brand = await Brand.findByPk(req.params.id);
+    if (!brand) {
+      return res.status(404).json({ error: 'Marca no encontrada' });
+    }
+
+    const oldValues = brand.toJSON();
+    const updateData = {
+      is_active: false,
+      deactivation_reason: req.body.reason || null // Campo opcional
+    };
+
+    await brand.update(updateData);
+
+    // Registrar acción
+    await actionLogger(
+      req, 
+      'DEACTIVATE', 
+      'brands', 
+      brand.brand_id, 
+      oldValues, 
+      brand.toJSON()
+    );
+
+    res.json({ 
+      message: 'Marca desactivada correctamente',
+      deactivation_reason: req.body.reason || undefined
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
  * /products:
  *   post:
  *     summary: Crear nuevo producto
